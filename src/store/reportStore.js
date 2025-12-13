@@ -1,0 +1,105 @@
+/**
+ * Report Store
+ * Manages alerts and dashboard reports
+ */
+
+import { create } from 'zustand';
+import { reportAPI } from '../services/api';
+
+export const useReportStore = create((set, get) => ({
+  alerts: [],
+  summary: null,
+  isLoading: false,
+  error: null,
+
+  // Fetch alerts
+  fetchAlerts: async (params = {}) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await reportAPI.alerts.list(params);
+      set({
+        alerts: response.results || response,
+        isLoading: false,
+      });
+      return response;
+    } catch (error) {
+      set({
+        error: error.message,
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  // Mark alert as read
+  markAlertAsRead: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await reportAPI.alerts.markAsRead(id);
+      const { alerts } = get();
+      set({
+        alerts: alerts.map((alert) => (alert.id === id ? response : alert)),
+        isLoading: false,
+      });
+      return response;
+    } catch (error) {
+      set({
+        error: error.message,
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  // Fetch dashboard summary
+  fetchSummary: async (params = {}) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await reportAPI.summary(params);
+      set({
+        summary: response,
+        isLoading: false,
+      });
+      return response;
+    } catch (error) {
+      set({
+        error: error.message,
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  // Fetch monthly report
+  fetchMonthlyReport: async (year, month) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await reportAPI.monthlyReport(year, month);
+      set({ isLoading: false });
+      return response;
+    } catch (error) {
+      set({
+        error: error.message,
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  // Get unread alerts count
+  getUnreadCount: () => {
+    const { alerts } = get();
+    return alerts.filter((alert) => !alert.is_read).length;
+  },
+
+  // Get alerts by type
+  getAlertsByType: (type) => {
+    const { alerts } = get();
+    return alerts.filter((alert) => alert.alert_type === type);
+  },
+
+  // Clear error
+  clearError: () => {
+    set({ error: null });
+  },
+}));
