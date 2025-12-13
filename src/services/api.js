@@ -18,15 +18,26 @@ const apiCall = async (endpoint, options = {}) => {
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+    console.log(`🔐 Sending token with ${options.method || 'GET'} ${endpoint}`);
+    console.log(`   Token: ${token.substring(0, 20)}...`);
+  } else if (options.method !== 'GET' || endpoint !== '/auth/login/' && endpoint !== '/auth/register/') {
+    // Only log if it's not a login/register request
+    console.warn(`⚠️ No access token found for ${options.method || 'GET'} ${endpoint}`);
   }
+
+  console.log(`📤 API Request: ${options.method || 'GET'} ${API_BASE_URL}${endpoint}`);
+  console.log(`   Headers:`, headers);
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
   });
 
+  console.log(`📥 API Response: ${response.status} ${response.statusText}`);
+
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
+    console.error(`❌ API Error:`, error);
     throw {
       status: response.status,
       message: error.detail || error.message || 'An error occurred',

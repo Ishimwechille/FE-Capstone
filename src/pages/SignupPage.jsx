@@ -49,7 +49,10 @@ export default function SignupPage() {
 
     try {
       await register(formData);
-      navigate('/dashboard');
+      // Wait a moment for state to update and token to be stored
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 100);
     } catch (error) {
       setFormError(error.message || 'Registration failed');
     }
