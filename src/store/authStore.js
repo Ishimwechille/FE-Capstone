@@ -14,7 +14,7 @@ export const useAuthStore = create((set) => ({
 
   // Initialize from localStorage
   initialize: () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     const user = localStorage.getItem('user');
     if (token && user) {
       set({ token, user: JSON.parse(user) });
@@ -26,10 +26,11 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await authAPI.register(userData);
-      localStorage.setItem('token', response.token);
+      localStorage.setItem('access_token', response.access);
+      localStorage.setItem('refresh_token', response.refresh);
       localStorage.setItem('user', JSON.stringify(response.user));
       set({
-        token: response.token,
+        token: response.access,
         user: response.user,
         isLoading: false,
       });
@@ -48,10 +49,11 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await authAPI.login(credentials);
-      localStorage.setItem('token', response.token);
+      localStorage.setItem('access_token', response.access);
+      localStorage.setItem('refresh_token', response.refresh);
       localStorage.setItem('user', JSON.stringify(response.user));
       set({
-        token: response.token,
+        token: response.access,
         user: response.user,
         isLoading: false,
       });
@@ -73,7 +75,8 @@ export const useAuthStore = create((set) => ({
     } catch (error) {
       console.error('Logout error:', error);
     }
-    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
     set({
       user: null,
@@ -129,5 +132,5 @@ export const useAuthStore = create((set) => ({
   },
 
   // Check if user is authenticated
-  isAuthenticated: () => !!localStorage.getItem('token'),
+  isAuthenticated: () => !!localStorage.getItem('access_token'),
 }));
