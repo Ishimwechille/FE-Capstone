@@ -233,6 +233,24 @@ export const budgetAPI = {
         method: 'DELETE',
       });
     },
+
+    markCompleted: async (id) => {
+      return apiCall(`/budgets/goals/${id}/mark_completed/`, {
+        method: 'POST',
+      });
+    },
+
+    updateProgress: async (id, current_amount) => {
+      return apiCall(`/budgets/goals/${id}/update_progress/`, {
+        method: 'POST',
+        body: JSON.stringify({ current_amount }),
+      });
+    },
+
+    active: async (params = {}) => {
+      const queryString = new URLSearchParams(params).toString();
+      return apiCall(`/budgets/goals/active/?${queryString}`);
+    },
   },
 };
 
@@ -246,11 +264,27 @@ export const reportAPI = {
       return apiCall(`/reports/alerts/?${queryString}`);
     },
 
-    markAsRead: async (id) => {
-      return apiCall(`/reports/alerts/${id}/`, {
-        method: 'PATCH',
-        body: JSON.stringify({ is_read: true }),
+    create: async (alertData) => {
+      return apiCall('/reports/alerts/', {
+        method: 'POST',
+        body: JSON.stringify(alertData),
       });
+    },
+
+    markAsRead: async (id) => {
+      return apiCall(`/reports/alerts/${id}/mark_as_read/`, {
+        method: 'POST',
+      });
+    },
+
+    markAllAsRead: async () => {
+      return apiCall('/reports/alerts/mark_all_as_read/', {
+        method: 'POST',
+      });
+    },
+
+    unread: async () => {
+      return apiCall('/reports/alerts/unread/');
     },
   },
 
@@ -258,6 +292,17 @@ export const reportAPI = {
   summary: async (params = {}) => {
     const queryString = new URLSearchParams(params).toString();
     return apiCall(`/reports/summary/?${queryString}`);
+  },
+
+  // Category breakdown
+  breakdown: async (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return apiCall(`/reports/breakdown/?${queryString}`);
+  },
+
+  // Budget status
+  budgetStatus: async () => {
+    return apiCall('/reports/budget_status/');
   },
 
   // Monthly report

@@ -59,6 +59,10 @@ export default function TransactionForm({ type = 'expense', balance = 0, categor
     setLoading(true);
 
     try {
+      const categoryObj = categories.find(c => c.id === parseInt(formData.category));
+      const categoryName = categoryObj?.name || 'Unknown';
+      const amount = parseFloat(formData.amount);
+      
       if (type === 'income') {
         await createIncome(formData);
         setSuccess('Income recorded successfully!');
@@ -68,7 +72,7 @@ export default function TransactionForm({ type = 'expense', balance = 0, categor
       }
       
       setTimeout(() => {
-        onSuccess?.();
+        onSuccess?.(amount, categoryName);
         setSuccess('');
       }, 1500);
 

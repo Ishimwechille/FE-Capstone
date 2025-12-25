@@ -6,12 +6,14 @@
 import { useState, useEffect } from 'react';
 import { useTransactionStore } from '../store/transactionStore';
 import { useBudgetStore } from '../store/budgetStore';
+import { useNotificationTrigger } from '../hooks/useNotificationTrigger';
 import TransactionForm from '../components/TransactionForm';
 import TransactionList from '../components/TransactionList';
 
 export default function TransactionsPage() {
   const { incomes, expenses, fetchIncomes, fetchExpenses, getTotalIncome, getTotalExpenses, getNetBalance } = useTransactionStore();
   const { categories, fetchCategories } = useBudgetStore();
+  const { notifyIncomeAdded, notifyExpenseAdded } = useNotificationTrigger();
   const [tab, setTab] = useState('all'); // 'all', 'income', 'expense'
   const [activeForm, setActiveForm] = useState(null); // 'income', 'expense', or null
 
@@ -30,6 +32,23 @@ export default function TransactionsPage() {
 
     loadData();
   }, []);
+
+  const handleTransactionSuccess = async (transactionType, amount, category) => {
+    setActiveForm(null);
+    if (transactionType === 'income') {
+      try {
+        await notifyIncomeAdded(amount, category);
+      } catch (err) {
+        console.error('Error creating notification:', err);
+      }
+    } else {
+      try {
+        await notifyExpenseAdded(amount, category);
+      } catch (err) {
+        console.error('Error creating notification:', err);
+      }
+    }
+  };
 
   const allTransactions = [
     ...incomes.map((inc) => ({ ...inc, type: 'income' })),
@@ -123,8 +142,8 @@ export default function TransactionsPage() {
             type="income"
             balance={balance}
             categories={categories.filter((c) => c.type === 'income')}
-            onSuccess={() => {
-              setActiveForm(null);
+            onSuccess={(amount, category) => {
+              handleTransactionSuccess('income', amount, category);
               fetchIncomes();
               fetchExpenses();
             }}
@@ -144,8 +163,8 @@ export default function TransactionsPage() {
             type="expense"
             balance={balance}
             categories={categories.filter((c) => c.type === 'expense')}
-            onSuccess={() => {
-              setActiveForm(null);
+            onSuccess={(amount, category) => {
+              handleTransactionSuccess('expense', amount, category);
               fetchIncomes();
               fetchExpenses();
             }}

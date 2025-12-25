@@ -1,11 +1,12 @@
 /**
  * Dashboard Page
- * Main dashboard showing summary and recent transactions
+ * Main dashboard showing summary and recent transactions with alerts
  */
 
 import { useEffect } from 'react';
 import { useTransactionStore } from '../store/transactionStore';
 import { useReportStore } from '../store/reportStore';
+import { useBudgetStore } from '../store/budgetStore';
 import DashboardSummaryCard from '../components/DashboardSummaryCard';
 import RecentTransactions from '../components/RecentTransactions';
 import AlertsPanel from '../components/AlertsPanel';
@@ -21,39 +22,63 @@ export default function DashboardPage() {
     getNetBalance,
   } = useTransactionStore();
 
-  const { fetchAlerts, fetchSummary } = useReportStore();
+  const { 
+    fetchUnreadAlerts, 
+    fetchSummary,
+    fetchBreakdown,
+    fetchBudgetStatus,
+    unreadAlerts 
+  } = useReportStore();
+
+  const { fetchGoals, goals } = useBudgetStore();
 
   useEffect(() => {
-    // Fetch data on mount
+    // Fetch all data on mount
     const loadData = async () => {
       try {
-        await fetchIncomes();
-        await fetchExpenses();
-        await fetchAlerts();
-        await fetchSummary();
+        await Promise.all([
+          fetchIncomes(),
+          fetchExpenses(),
+          fetchUnreadAlerts(),
+          fetchSummary(),
+          fetchBreakdown(),
+          fetchBudgetStatus(),
+          fetchGoals(),
+        ]);
       } catch (error) {
         console.error('Error loading dashboard data:', error);
       }
     };
 
     loadData();
-  }, []);
+  }, [
+    fetchIncomes,
+    fetchExpenses,
+    fetchUnreadAlerts,
+    fetchSummary,
+    fetchBreakdown,
+    fetchBudgetStatus,
+    fetchGoals,
+  ]);
 
   const currentMonth = new Date().toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',
   });
 
+  const activeGoalsCount = goals.filter((g) => !g.is_completed).length;
+  const completedGoalsCount = goals.filter((g) => g.is_completed).length;
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Home</h1>
         <p className="text-gray-600 mt-2">Financial overview for {currentMonth}</p>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <DashboardSummaryCard
           title="Total Income"
           amount={getTotalIncome()}
@@ -72,7 +97,25 @@ export default function DashboardPage() {
           icon="💙"
           color={getNetBalance() >= 0 ? 'blue' : 'red'}
         />
+        <DashboardSummaryCard
+          title="Active Goals"
+          amount={activeGoalsCount}
+          icon="🎯"
+          color="purple"
+          subtitle={`${completedGoalsCount} completed`}
+        />
       </div>
+
+      {/* Unread Alerts Indicator */}
+      {unreadAlerts.length > 0 && (
+        <div className="p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+          <div className="flex items-center gap-2">
+            <span className="text-blue-600 font-semibold">
+              🔔 You have {unreadAlerts.length} new notification{unreadAlerts.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

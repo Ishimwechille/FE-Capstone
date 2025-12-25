@@ -34,8 +34,9 @@ export default function GoalForm({ categories, onSuccess }) {
     setLoading(true);
 
     try {
+      const goalName = formData.name;
       await createGoal(formData);
-      onSuccess?.();
+      onSuccess?.(goalName);
       setFormData({
         name: '',
         description: '',

@@ -253,6 +253,46 @@ export const useBudgetStore = create((set, get) => ({
     }
   },
 
+  // Mark goal as completed
+  markGoalCompleted: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await budgetAPI.goals.markCompleted(id);
+      const { goals } = get();
+      set({
+        goals: goals.map((goal) => (goal.id === id ? response : goal)),
+        isLoading: false,
+      });
+      return response;
+    } catch (error) {
+      set({
+        error: error.message,
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  // Update goal progress
+  updateGoalProgress: async (id, current_amount) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await budgetAPI.goals.updateProgress(id, current_amount);
+      const { goals } = get();
+      set({
+        goals: goals.map((goal) => (goal.id === id ? response : goal)),
+        isLoading: false,
+      });
+      return response;
+    } catch (error) {
+      set({
+        error: error.message,
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
   // Clear error
   clearError: () => {
     set({ error: null });

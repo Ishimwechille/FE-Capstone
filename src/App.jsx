@@ -19,16 +19,20 @@ import ReportsPage from './pages/ReportsPage';
 // Components
 import Layout from './components/Layout';
 import PrivateRoute from './components/PrivateRoute';
+import NotificationCenter from './components/NotificationCenter';
 
 function App() {
   const { initialize, token } = useAuthStore();
 
   useEffect(() => {
     initialize();
-  }, []);
+  }, [initialize]);
 
   return (
     <Router>
+      {/* Global Notification Center */}
+      {token && <NotificationCenter />}
+
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />

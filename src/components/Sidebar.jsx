@@ -6,7 +6,7 @@
 import { Link, useLocation } from 'react-router-dom';
 
 const menuItems = [
-  { name: 'Dashboard', path: '/dashboard', icon: '📊' },
+  { name: 'Home', path: '/dashboard', icon: '📊' },
   { name: 'Transactions', path: '/transactions', icon: '💳' },
   { name: 'Budgets', path: '/budgets', icon: '💰' },
   { name: 'Goals', path: '/goals', icon: '🎯' },
