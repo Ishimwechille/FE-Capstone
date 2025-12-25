@@ -33,7 +33,10 @@ export default function DashboardPage() {
   const { fetchGoals, goals } = useBudgetStore();
 
   useEffect(() => {
+<<<<<<< HEAD
     // Fetch all data on mount
+=======
+>>>>>>> 1590ebec2ca594db30760efe6b7666d016b8e22e
     const loadData = async () => {
       try {
         await Promise.all([
@@ -70,11 +73,21 @@ export default function DashboardPage() {
   const completedGoalsCount = goals.filter((g) => g.is_completed).length;
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
+<<<<<<< HEAD
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Home</h1>
         <p className="text-gray-600 mt-2">Financial overview for {currentMonth}</p>
+=======
+      <div className="mb-10">
+        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+          Dashboard
+        </h1>
+        <p className="text-gray-600 mt-2 text-lg">
+          Financial overview for <span className="font-semibold">{currentMonth}</span>
+        </p>
+>>>>>>> 1590ebec2ca594db30760efe6b7666d016b8e22e
       </div>
 
       {/* Summary Cards */}
@@ -118,14 +131,14 @@ export default function DashboardPage() {
       )}
 
       {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Transactions - Takes 2 columns */}
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+        {/* Recent Transactions */}
+        <div className="lg:col-span-2 bg-white shadow-md rounded-xl p-6 hover:shadow-lg transition">
           <RecentTransactions incomes={incomes.slice(0, 5)} expenses={expenses.slice(0, 5)} />
         </div>
 
         {/* Alerts */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 bg-white shadow-md rounded-xl p-6 hover:shadow-lg transition">
           <AlertsPanel />
         </div>
       </div>
